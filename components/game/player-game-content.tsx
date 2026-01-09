@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, use } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, useParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -31,8 +31,12 @@ const ANSWER_COLORS = [
   "bg-green-500 hover:bg-green-600 border-green-700"
 ]
 
-export function PlayerGameContent({ params }: { params: Promise<{ sessionId: string }> }) {
-  const { sessionId } = use(params)
+export function PlayerGameContent({ params }: { params?: Promise<{ sessionId: string }> }) {
+  // Graceful fallback if params not passed (though we prefer useParams in client components)
+  // const { sessionId } = use(params!) 
+  // actually, safer to just use useParams() for a client component to avoid prop drilling issues in some architectures
+  const paramsHook = useParams()
+  const sessionId = (paramsHook?.sessionId as string) || ""
   const searchParams = useSearchParams()
   const playerId = searchParams.get("playerId")
   const router = useRouter()
@@ -139,7 +143,7 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
 
       if (isMultiSelect) {
         // Exact match logic
-        const correctIds = correctOptions?.map(o => o.id) || []
+        const correctIds = correctOptions?.map((o: { id: string }) => o.id) || []
         const selectedIds = answerOptionIds || []
 
         const hasSameLength = correctIds.length === selectedIds.length
@@ -163,7 +167,7 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
       }
 
       // Save answer
-      await supabase.from("player_answers").insert({
+      const insertPayload: any = {
         player_id: playerId,
         question_id: currentQuestion.id,
         answer_option_id: answerOptionId,
@@ -171,7 +175,9 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
         is_correct: isCorrect,
         response_time_ms: responseTimeMs,
         points_earned: pointsEarned,
-      })
+      }
+
+      await supabase.from("player_answers").insert(insertPayload)
 
       // Update player score
       if (pointsEarned > 0) {
