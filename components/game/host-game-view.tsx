@@ -95,18 +95,12 @@ export function HostGameView() {
                 {/* Header Information */}
                 <div className="flex justify-between items-center text-muted-foreground">
                     <span className="font-bold text-lg">Question {session.current_question_index + 1} / {quiz.questions?.length}</span>
-                    <div className="flex items-center gap-2">
-                        {/* DEBUG OVERLAY */}
-                        <div className="text-xs font-mono bg-black/50 text-white p-2 rounded hidden lg:block">
-                            Debug: Ans:{playersAnsweredCount} Total:{totalPlayers} Len:{currentQuestionAnswers.length}
-                        </div>
-                        <div className="flex items-center gap-2 bg-background px-4 py-2 rounded-full border border-border">
-                            <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                            </span>
-                            <span className="font-mono font-bold text-foreground">{playersAnsweredCount} / {totalPlayers} Answered</span>
-                        </div>
+                    <div className="flex items-center gap-2 bg-background px-4 py-2 rounded-full border border-border">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        <span className="font-mono font-bold text-foreground">{playersAnsweredCount} / {totalPlayers} Answered</span>
                     </div>
                 </div>
 
@@ -157,9 +151,6 @@ export function HostGameView() {
                         <Card className="bg-card border-border">
                             <CardContent className="p-6 space-y-4">
                                 <div className="font-bold uppercase text-xs text-muted-foreground tracking-widest mb-2">Host Controls</div>
-                                <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => refreshState()}>
-                                    🔄 Force Refresh
-                                </Button>
 
                                 {gameState === "answering" ? (
                                     <Button variant="secondary" size="lg" className="w-full justify-between" onClick={showResults}>
