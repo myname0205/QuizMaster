@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Zap, Clock, Check, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Zap, Clock, Check, X, CheckCircle2, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
@@ -14,6 +15,7 @@ interface QuestionData {
   question_text: string
   time_limit: number
   points: number
+  question_type?: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "MULTIPLE_SELECT"
   answer_options: {
     id: string
     option_text: string
@@ -21,6 +23,13 @@ interface QuestionData {
     is_correct?: boolean
   }[]
 }
+
+const ANSWER_COLORS = [
+  "bg-red-500 hover:bg-red-600 border-red-700",
+  "bg-blue-500 hover:bg-blue-600 border-blue-700",
+  "bg-yellow-500 hover:bg-yellow-600 border-yellow-700 text-yellow-950",
+  "bg-green-500 hover:bg-green-600 border-green-700"
+]
 
 export function PlayerGameContent({ params }: { params: Promise<{ sessionId: string }> }) {
   const { sessionId } = use(params)
@@ -32,7 +41,12 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null)
   const [phase, setPhase] = useState<"waiting" | "question" | "answered" | "results" | "leaderboard">("waiting")
   const [timeLeft, setTimeLeft] = useState(30)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+
+  // State for answers
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null) // Legacy single
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]) // Multi
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const [answerResult, setAnswerResult] = useState<{ correct: boolean; points: number } | null>(null)
   const [totalScore, setTotalScore] = useState(0)
   const [questionStartTime, setQuestionStartTime] = useState<number>(0)
@@ -51,6 +65,8 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
         setPhase("question")
         setTimeLeft(payload.question.time_limit)
         setSelectedAnswer(null)
+        setSelectedOptions([])
+        setIsSubmitting(false)
         setAnswerResult(null)
         setQuestionStartTime(Date.now())
       })
@@ -78,7 +94,7 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          if (!selectedAnswer) {
+          if (!selectedAnswer && selectedOptions.length === 0 && !isSubmitting) {
             setPhase("results")
           }
           return 0
@@ -88,27 +104,53 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [phase, timeLeft, selectedAnswer])
+  }, [phase, timeLeft, selectedAnswer, selectedOptions, isSubmitting])
 
-  const submitAnswer = async (optionId: string) => {
-    if (selectedAnswer || !currentQuestion || !playerId) return
+  const submitAnswer = async (answerInput: string | string[]) => {
+    if ((selectedAnswer || isSubmitting) || !currentQuestion || !playerId) return
 
-    setSelectedAnswer(optionId)
+    let answerOptionId: string | null = null
+    let answerOptionIds: string[] | null = null
+
+    if (Array.isArray(answerInput)) {
+      answerOptionIds = answerInput
+      setSelectedOptions(answerInput)
+    } else {
+      answerOptionId = answerInput
+      setSelectedAnswer(answerInput)
+    }
+
+    setIsSubmitting(true)
     setPhase("answered")
 
     const responseTimeMs = Date.now() - questionStartTime
 
     // Submit answer to database
     try {
-      // First, get the correct answer from the database
-      const { data: correctOption } = await supabase
+      // Fetch correct answer(s)
+      const { data: correctOptions } = await supabase
         .from("answer_options")
         .select("id, is_correct")
         .eq("question_id", currentQuestion.id)
         .eq("is_correct", true)
-        .single()
 
-      const isCorrect = correctOption?.id === optionId
+      const isMultiSelect = currentQuestion.question_type === "MULTIPLE_SELECT"
+      let isCorrect = false
+
+      if (isMultiSelect) {
+        // Exact match logic
+        const correctIds = correctOptions?.map(o => o.id) || []
+        const selectedIds = answerOptionIds || []
+
+        const hasSameLength = correctIds.length === selectedIds.length
+        const allSelectedAreCorrect = selectedIds.every(id => correctIds.includes(id))
+        isCorrect = hasSameLength && allSelectedAreCorrect
+      } else {
+        // Single match
+        const selectedId = answerOptionId
+        const correctId = correctOptions?.[0]?.id
+        isCorrect = selectedId === correctId
+      }
 
       // Calculate points (bonus for speed)
       let pointsEarned = 0
@@ -124,7 +166,8 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
       await supabase.from("player_answers").insert({
         player_id: playerId,
         question_id: currentQuestion.id,
-        answer_option_id: optionId,
+        answer_option_id: answerOptionId,
+        answer_option_ids: answerOptionIds,
         is_correct: isCorrect,
         response_time_ms: responseTimeMs,
         points_earned: pointsEarned,
@@ -143,19 +186,40 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
     } catch (error) {
       console.error("Failed to submit answer:", error)
       toast.error("Failed to submit answer")
+      setIsSubmitting(false) // Allow retry? or just stuck? Stuck is better than error loop
     }
   }
 
-  const colors = [
-    "bg-chart-1 hover:bg-chart-1/90",
-    "bg-chart-2 hover:bg-chart-2/90",
-    "bg-chart-3 hover:bg-chart-3/90",
-    "bg-chart-4 hover:bg-chart-4/90",
-  ]
+  const handleOptionClick = (optionId: string) => {
+    if (isSubmitting || selectedAnswer) return
+
+    const isMultiSelect = currentQuestion?.question_type === "MULTIPLE_SELECT"
+
+    if (isMultiSelect) {
+      setSelectedOptions(prev => {
+        if (prev.includes(optionId)) {
+          return prev.filter(id => id !== optionId)
+        } else {
+          return [...prev, optionId]
+        }
+      })
+    } else {
+      submitAnswer(optionId)
+    }
+  }
+
+  const handleMultiSubmit = () => {
+    if (selectedOptions.length === 0) return
+    submitAnswer(selectedOptions)
+  }
+
+  const colors = ANSWER_COLORS // Start using consistent colors
 
   if (!playerId) {
     return null
   }
+
+  const isMultiSelect = currentQuestion?.question_type === "MULTIPLE_SELECT"
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -205,24 +269,55 @@ export function PlayerGameContent({ params }: { params: Promise<{ sessionId: str
             </CardContent>
           </Card>
 
+          {isMultiSelect && (
+            <div className="text-center mb-4 text-sm text-muted-foreground font-medium uppercase tracking-wider animate-pulse">
+              Select all that apply
+            </div>
+          )}
+
           {/* Answer Options */}
           <div className="flex-1 grid grid-cols-1 gap-3">
-            {currentQuestion.answer_options.map((option, idx) => (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => submitAnswer(option.id)}
-                disabled={!!selectedAnswer}
-                className={cn(
-                  "rounded-xl p-4 text-white text-left font-medium transition-all active:scale-95",
-                  colors[idx],
-                  selectedAnswer && "opacity-50",
-                )}
-              >
-                {option.option_text}
-              </button>
-            ))}
+            {currentQuestion.answer_options.map((option, idx) => {
+              const isSelected = selectedOptions.includes(option.id)
+
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleOptionClick(option.id)}
+                  disabled={!!selectedAnswer || isSubmitting}
+                  className={cn(
+                    "rounded-xl p-4 text-white text-left font-medium transition-all active:scale-95 relative",
+                    colors[idx % colors.length], // Use modulo to prevent index error
+                    (selectedAnswer && !selectedAnswer.includes(option.id)) && "opacity-50", // Dim unselected
+                    isMultiSelect && isSelected && "ring-4 ring-offset-2 ring-primary brightness-110",
+                    isMultiSelect && !isSelected && "opacity-90"
+                  )}
+                >
+                  {isMultiSelect && (
+                    <div className={cn("absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center", isSelected ? "bg-white text-black" : "bg-transparent")}>
+                      {isSelected && <CheckCircle2 className="w-4 h-4" />}
+                    </div>
+                  )}
+                  {option.option_text}
+                </button>
+              )
+            })}
           </div>
+
+          {/* Submit Button for Multi-Select */}
+          {isMultiSelect && (
+            <div className="mt-6">
+              <Button
+                size="lg"
+                className="w-full text-xl py-6 font-bold uppercase tracking-widest shadow-xl"
+                onClick={handleMultiSubmit}
+                disabled={selectedOptions.length === 0 || isSubmitting}
+              >
+                {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : "Submit Answer"}
+              </Button>
+            </div>
+          )}
         </main>
       )}
 
