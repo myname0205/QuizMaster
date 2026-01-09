@@ -16,7 +16,7 @@ interface GameContextType {
     startGame: () => Promise<void>
     nextQuestion: () => Promise<void>
     showResults: () => Promise<void>
-    submitAnswer: (answerId: string) => Promise<void>
+    submitAnswer: (answerId: string | string[]) => Promise<void>
     refreshState: () => Promise<void>
 }
 
@@ -264,8 +264,8 @@ export function GameProvider({
         }).eq("id", session.id)
     }
 
-    const submitAnswer = async (answerOptionId: string) => {
-        console.log("[submitAnswer] Called with:", { answerOptionId, playerId, gameState, currentIndex: session.current_question_index })
+    const submitAnswer = async (answerInput: string | string[]) => {
+        console.log("[submitAnswer] Called with:", { answerInput, playerId, gameState, currentIndex: session.current_question_index })
 
         if (!playerId) {
             console.error("[submitAnswer] No playerId!")
@@ -285,8 +285,36 @@ export function GameProvider({
             return
         }
 
-        const answerOption = currentQuestion.answer_options?.find(o => o.id === answerOptionId)
-        const isCorrect = answerOption?.is_correct || false
+        let answerOptionId: string | null = null
+        let answerOptionIds: string[] | null = null
+
+        if (Array.isArray(answerInput)) {
+            answerOptionIds = answerInput
+        } else {
+            answerOptionId = answerInput
+        }
+
+        const isMultiSelect = currentQuestion.question_type === "MULTIPLE_SELECT"
+        let isCorrect = false
+
+        if (isMultiSelect) {
+            // Precise exact match logic
+            const correctOptionIds = currentQuestion.answer_options?.filter(o => o.is_correct).map(o => o.id) || []
+            const selectedIds = answerOptionIds || []
+
+            // Check if lengths match and every selected ID is in correct IDs
+            const hasSameLength = correctOptionIds.length === selectedIds.length
+            const allSelectedAreCorrect = selectedIds.every(id => correctOptionIds.includes(id))
+
+            isCorrect = hasSameLength && allSelectedAreCorrect
+
+            console.log("[submitAnswer] Multi-select check:", { correctOptionIds, selectedIds, isCorrect })
+        } else {
+            // Standard single choice
+            const selectedId = answerOptionId || (answerOptionIds?.[0])
+            const answerOption = currentQuestion.answer_options?.find(o => o.id === selectedId)
+            isCorrect = answerOption?.is_correct || false
+        }
 
         // Calculate Score
         let points = 0

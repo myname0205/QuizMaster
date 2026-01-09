@@ -70,6 +70,7 @@ export interface PlayerAnswer {
   player_id: string
   question_id: string
   answer_option_id: string | null
+  answer_option_ids?: string[] | null // For MULTIPLE_SELECT
   is_correct: boolean
   response_time_ms: number | null
   points_earned: number

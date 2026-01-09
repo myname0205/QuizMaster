@@ -51,12 +51,8 @@ function PlayerGameContent() {
     const { session, quiz, playerAnswers, timeLeft, gameState, submitAnswer, players } = useGame()
     const searchParams = useSearchParams()
     const playerId = searchParams.get("playerId")
+    // State for answering
     const [isSubmitting, setIsSubmitting] = useState(false)
-
-    // Reset submitting state when question changes
-    useEffect(() => {
-        setIsSubmitting(false)
-    }, [session.current_question_index])
 
     const currentQuestion = quiz.questions?.[session.current_question_index]
     const myAnswer = playerAnswers.find(a => a.player_id === playerId && a.question_id === currentQuestion?.id)
@@ -223,6 +219,41 @@ function PlayerGameContent() {
 
     // Question / Answer Buttons
     return (
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+    const isMultiSelect = currentQuestion.question_type === "MULTIPLE_SELECT"
+
+    // Reset state when question changes
+    useEffect(() => {
+        setIsSubmitting(false)
+        setSelectedOptions([])
+    }, [session.current_question_index])
+
+    const handleOptionClick = async (optionId: string) => {
+        if (isSubmitting) return
+
+        if (isMultiSelect) {
+            // Toggle selection
+            setSelectedOptions(prev => {
+                if (prev.includes(optionId)) {
+                    return prev.filter(id => id !== optionId)
+                } else {
+                    return [...prev, optionId]
+                }
+            })
+        } else {
+            // Single select: immediate submit
+            setIsSubmitting(true)
+            await submitAnswer(optionId)
+        }
+    }
+
+    const handleMultiSubmit = async () => {
+        if (selectedOptions.length === 0 || isSubmitting) return
+        setIsSubmitting(true)
+        await submitAnswer(selectedOptions)
+    }
+
+    return (
         <div className="min-h-screen bg-background flex flex-col p-4">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
@@ -230,36 +261,68 @@ function PlayerGameContent() {
                 <span className="font-mono font-bold text-2xl">{timeLeft}s</span>
             </div>
 
-            {/* Question Text (Optional, usually on host screen but good for mobile) */}
             {/* Question Text */}
-            <div className="text-center mb-8 font-bold text-xl md:text-2xl text-foreground px-4 animate-in fade-in slide-in-from-top-4">
+            <div className="text-center mb-2 font-bold text-xl md:text-2xl text-foreground px-4 animate-in fade-in slide-in-from-top-4">
                 {currentQuestion.question_text}
             </div>
 
+            {isMultiSelect && (
+                <div className="text-center mb-6 text-sm text-muted-foreground font-medium uppercase tracking-wider animate-pulse">
+                    Select all that apply
+                </div>
+            )}
+
             {/* Answer Grid */}
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full mb-8">
-                {currentQuestion.answer_options?.map((option, index) => (
-                    <button
-                        key={option.id}
-                        onClick={async () => {
-                            if (isSubmitting) return
-                            setIsSubmitting(true)
-                            await submitAnswer(option.id)
-                        }}
-                        disabled={isSubmitting}
-                        className={cn(
-                            "flex flex-col items-center justify-center p-8 rounded-2xl border-b-8 transition-all shadow-lg",
-                            isSubmitting ? "opacity-50 cursor-not-allowed" : "active:scale-95 active:border-b-0 translate-y-0 active:translate-y-2",
-                            ANSWER_COLORS[index % ANSWER_COLORS.length]
-                        )}
-                    >
-                        <span className="text-4xl mb-4 text-white drop-shadow-md">{ANSWER_ICONS[index % ANSWER_ICONS.length]}</span>
-                        <span className="text-xl md:text-2xl font-bold text-white drop-shadow-md text-center">
-                            {option.option_text}
-                        </span>
-                    </button>
-                ))}
+                {currentQuestion.answer_options?.map((option, index) => {
+                    const isSelected = selectedOptions.includes(option.id)
+                    // If multi-select, show selected state visually
+                    // If submitting/answered, simplify just show active state if needed? (Actually view switches after submit)
+
+                    return (
+                        <button
+                            key={option.id}
+                            onClick={() => handleOptionClick(option.id)}
+                            disabled={isSubmitting}
+                            className={cn(
+                                "flex flex-col items-center justify-center p-8 rounded-2xl border-b-8 transition-all shadow-lg relative",
+                                isSubmitting ? "opacity-50 cursor-not-allowed" : "active:scale-95 active:border-b-0 translate-y-0 active:translate-y-2",
+                                ANSWER_COLORS[index % ANSWER_COLORS.length],
+                                // Multi-select Styling Overrides for Selection State
+                                isMultiSelect && isSelected && "ring-4 ring-offset-4 ring-primary scale-[0.98] border-b-0 translate-y-2 brightness-110",
+                                isMultiSelect && !isSelected && "opacity-90"
+                            )}
+                        >
+                            {/* Checkbox indicator for multi-select */}
+                            {isMultiSelect && (
+                                <div className={cn("absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center", isSelected ? "bg-white text-black" : "bg-transparent")}>
+                                    {isSelected && <CheckCircle2 className="w-4 h-4" />}
+                                </div>
+                            )}
+
+                            <span className="text-4xl mb-4 text-white drop-shadow-md">{ANSWER_ICONS[index % ANSWER_ICONS.length]}</span>
+                            <span className="text-xl md:text-2xl font-bold text-white drop-shadow-md text-center">
+                                {option.option_text}
+                            </span>
+                        </button>
+                    )
+                })}
             </div>
+
+            {/* Submit Button for Multi-Select */}
+            {isMultiSelect && (
+                <div className="max-w-4xl mx-auto w-full mb-4">
+                    <Button
+                        size="lg"
+                        className="w-full text-xl py-8 font-black uppercase tracking-widest shadow-xl"
+                        onClick={handleMultiSubmit}
+                        disabled={selectedOptions.length === 0 || isSubmitting}
+                    >
+                        {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : "Submit Answer"}
+                    </Button>
+                </div>
+            )}
         </div>
+    )
     )
 }
