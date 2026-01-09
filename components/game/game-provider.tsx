@@ -132,10 +132,34 @@ export function GameProvider({
                     setSession(latestSession)
                 }
             }
-        }, 1000) // Poll every 1s for better responsiveness during testing
+
+            // Also poll for answers to ensure we don't miss any (Realtime backup)
+            if (session.current_question_index >= 0 && quiz.questions) {
+                const currentQId = quiz.questions[session.current_question_index]?.id
+                if (currentQId) {
+                    const { data: answers } = await supabase
+                        .from("player_answers")
+                        .select("*")
+                        .eq("game_session_id", session.id)
+                        .eq("question_id", currentQId)
+
+                    if (answers) {
+                        setPlayerAnswers(prev => {
+                            // Only update if count changes to avoid re-renders (basic check)
+                            // or if we have 0 locally but server has some (missed realtime)
+                            if (prev.length !== answers.length) {
+                                console.log("[GameProvider] Polling updated answers:", answers.length)
+                                return answers
+                            }
+                            return prev
+                        })
+                    }
+                }
+            }
+        }, 1000) // Poll every 1s for better responsiveness
 
         return () => clearInterval(interval)
-    }, [session.id, session.current_question_index, session.question_start_time, session.status, supabase])
+    }, [session.id, session.current_question_index, session.question_start_time, session.status, supabase, quiz])
 
     // Timer Logic
     useEffect(() => {
@@ -338,7 +362,22 @@ export function GameProvider({
             .select("*")
             .eq("game_session_id", session.id)
         if (playersData) setPlayers(playersData)
-    }, [session.id, supabase])
+
+        if (session.current_question_index >= 0 && quiz.questions) {
+            const currentQId = quiz.questions[session.current_question_index]?.id
+            if (currentQId) {
+                const { data: answersData } = await supabase
+                    .from("player_answers")
+                    .select("*")
+                    .eq("game_session_id", session.id)
+                    .eq("question_id", currentQId)
+                if (answersData) {
+                    console.log("[GameProvider] refreshState fetched answers:", answersData.length)
+                    setPlayerAnswers(answersData)
+                }
+            }
+        }
+    }, [session.id, session.current_question_index, quiz.questions, supabase])
 
     return (
         <GameContext.Provider value={{ session, quiz, players, playerAnswers, timeLeft, gameState, isHost, startGame, nextQuestion, showResults, submitAnswer, refreshState }}>

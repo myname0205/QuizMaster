@@ -66,6 +66,7 @@ export interface Player {
 
 export interface PlayerAnswer {
   id: string
+  game_session_id: string
   player_id: string
   question_id: string
   answer_option_id: string | null
