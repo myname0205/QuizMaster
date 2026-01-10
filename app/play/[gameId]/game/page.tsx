@@ -34,8 +34,13 @@ export default async function PlayerGamePage({
         .eq("id", session.quiz_id)
         .single()
 
+    if (!quiz) {
+        console.error("Quiz not found for session:", session.id)
+        redirect("/join")
+    }
+
     // Sort questions
-    if (quiz?.questions) {
+    if (quiz.questions) {
         quiz.questions.sort((a: any, b: any) => a.order_index - b.order_index)
     }
 
