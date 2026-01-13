@@ -36,7 +36,7 @@ export default async function PlayerGamePage({
 
     if (!quiz) {
         console.error("Quiz not found for session:", session.id)
-        redirect("/join")
+        // redirect("/join") // REMOVED: Strict redirect causes loop if RLS fails. Let GameProvider show loading/error.
     }
 
     // Sort questions
