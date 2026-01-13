@@ -30,7 +30,25 @@ function PlayerGameContent() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
-    const currentQuestion = quiz.questions?.[session.current_question_index]
+
+    // Guard against null quiz
+    if (!quiz || !quiz.questions) {
+        return (
+            <div className="min-h-screen bg-primary/10 flex items-center justify-center p-4">
+                <Card className="w-full max-w-md bg-card border-border shadow-xl">
+                    <CardContent className="p-12 flex flex-col items-center text-center space-y-6">
+                        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                        <div>
+                            <h2 className="text-2xl font-bold mb-2">Loading Game Data...</h2>
+                            <p className="text-muted-foreground">Please wait while we fetch the quiz.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
+    const currentQuestion = quiz.questions[session.current_question_index]
     const isMultiSelect = currentQuestion?.question_type === "MULTIPLE_SELECT"
     const myAnswer = playerAnswers.find(a => a.player_id === playerId && a.question_id === currentQuestion?.id)
     const hasAnswered = !!myAnswer || isSubmitting

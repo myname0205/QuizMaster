@@ -7,7 +7,7 @@ import { toast } from "sonner"
 
 interface GameContextType {
     session: GameSession
-    quiz: Quiz
+    quiz: Quiz | null
     players: Player[]
     playerAnswers: PlayerAnswer[]
     timeLeft: number
@@ -25,7 +25,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined)
 interface GameProviderProps {
     children: ReactNode
     initialSession: GameSession
-    quiz: Quiz
+    quiz: Quiz | null
     isHost?: boolean
     playerId?: string
 }
@@ -69,7 +69,7 @@ export function GameProvider({
             setPlayerAnswers([])
 
             if (session.current_question_index >= 0) {
-                const currentQuestionId = quiz.questions?.[session.current_question_index]?.id
+                const currentQuestionId = quiz?.questions?.[session.current_question_index]?.id
                 if (currentQuestionId) {
                     const { data: answersData } = await supabase
                         .from("player_answers")
@@ -81,7 +81,7 @@ export function GameProvider({
             }
         }
         fetchGameData()
-    }, [session.id, session.current_question_index, quiz.questions, supabase])
+    }, [session.id, session.current_question_index, quiz?.questions, supabase])
 
     // Realtime Subscriptions
     useEffect(() => {
@@ -134,7 +134,7 @@ export function GameProvider({
             }
 
             // Also poll for answers to ensure we don't miss any (Realtime backup)
-            if (session.current_question_index >= 0 && quiz.questions) {
+            if (session.current_question_index >= 0 && quiz?.questions) {
                 const currentQId = quiz.questions[session.current_question_index]?.id
                 if (currentQId) {
                     const { data: answers } = await supabase
@@ -168,7 +168,7 @@ export function GameProvider({
             return
         }
 
-        const currentQuestion = quiz.questions?.[session.current_question_index]
+        const currentQuestion = quiz?.questions?.[session.current_question_index]
         if (!currentQuestion) return
 
         const startTime = new Date(session.question_start_time).getTime()
@@ -186,7 +186,7 @@ export function GameProvider({
         }, 100)
 
         return () => clearInterval(interval)
-    }, [session.question_start_time, session.current_question_index, quiz.questions])
+    }, [session.question_start_time, session.current_question_index, quiz?.questions])
 
     // Game State Derivation
     // Game State Derivation
@@ -199,7 +199,7 @@ export function GameProvider({
             // Calculate real state independent of the ticked 'timeLeft' to avoid initial flash
             // when timeLeft is 0 but start time was just set.
             const startTime = new Date(session.question_start_time).getTime()
-            const currentQ = quiz.questions?.[session.current_question_index]
+            const currentQ = quiz?.questions?.[session.current_question_index]
 
             // Default to 20s if missing, though it shouldn't be
             const timeLimitMs = (currentQ?.time_limit || 20) * 1000
@@ -212,7 +212,7 @@ export function GameProvider({
         }
 
         setGameState(newState)
-    }, [session.status, session.question_start_time, timeLeft, quiz.questions, session.current_question_index])
+    }, [session.status, session.question_start_time, timeLeft, quiz?.questions, session.current_question_index])
 
 
     // Actions
@@ -232,7 +232,7 @@ export function GameProvider({
 
         console.log("[nextQuestion] Starting - currentIndex:", session.current_question_index, "nextIndex:", nextIndex, "hasStartTime:", !!session.question_start_time)
 
-        if (nextIndex >= (quiz.questions?.length || 0)) {
+        if (nextIndex >= (quiz?.questions?.length || 0)) {
             console.log("[nextQuestion] Game finished")
             await supabase.from("game_sessions").update({ status: "finished", finished_at: new Date().toISOString() }).eq("id", session.id)
             return
@@ -279,7 +279,7 @@ export function GameProvider({
             return
         }
 
-        const currentQuestion = quiz.questions?.[session.current_question_index]
+        const currentQuestion = quiz?.questions?.[session.current_question_index]
         if (!currentQuestion) {
             console.error("[submitAnswer] No current question")
             return
@@ -391,7 +391,7 @@ export function GameProvider({
             .eq("game_session_id", session.id)
         if (playersData) setPlayers(playersData)
 
-        if (session.current_question_index >= 0 && quiz.questions) {
+        if (session.current_question_index >= 0 && quiz?.questions) {
             const currentQId = quiz.questions[session.current_question_index]?.id
             if (currentQId) {
                 const { data: answersData } = await supabase
@@ -405,7 +405,7 @@ export function GameProvider({
                 }
             }
         }
-    }, [session.id, session.current_question_index, quiz.questions, supabase])
+    }, [session.id, session.current_question_index, quiz?.questions, supabase])
 
     return (
         <GameContext.Provider value={{ session, quiz, players, playerAnswers, timeLeft, gameState, isHost, startGame, nextQuestion, showResults, submitAnswer, refreshState }}>

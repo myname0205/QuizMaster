@@ -31,6 +31,8 @@ export default async function HostGamePage({ params }: { params: Promise<{ gameI
         .eq("id", session.quiz_id)
         .single()
 
+    if (!quiz) redirect("/dashboard")
+
     // Sort questions by order_index
     if (quiz?.questions) {
         quiz.questions.sort((a: any, b: any) => a.order_index - b.order_index)
