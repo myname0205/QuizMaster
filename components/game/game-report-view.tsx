@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
-import { Download, AlertTriangle, CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, Clock } from "lucide-react"
 import type { Player, PlayerAnswer, Quiz } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -275,7 +275,13 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
                                 const qAnswers = answers.filter(a => a.question_id === question.id)
                                 const correctCount = qAnswers.filter(a => a.is_correct).length
                                 const accuracy = qAnswers.length > 0 ? Math.round((correctCount / qAnswers.length) * 100) : 0
-                                const correctAnswer = question.answer_options?.find(o => o.is_correct)
+
+                                const correctOptions = question.answer_options?.filter(o => o.is_correct) || []
+                                const incorrectOptions = question.answer_options?.filter(o => !o.is_correct) || []
+
+                                // Find players who didn't answer
+                                const answeredPlayerIds = new Set(qAnswers.map(a => a.player_id))
+                                const unansweredPlayers = players.filter(p => !answeredPlayerIds.has(p.id))
 
                                 return (
                                     <div key={question.id} className="border border-border rounded-lg p-6 bg-card">
@@ -299,35 +305,50 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
                                         <div className="space-y-4">
                                             <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Results Breakdown</div>
 
-                                            {/* Correct Answer First */}
-                                            {correctAnswer && (
-                                                <div className="border border-green-200 bg-green-50/50 rounded-lg p-4">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <CheckCircle className="w-5 h-5 text-green-600" />
-                                                        <span className="font-bold text-green-900">{correctAnswer.option_text}</span>
-                                                        <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full ml-2">CORRECT ANSWER</span>
+                                            {/* Correct Answers */}
+                                            {correctOptions.map(option => {
+                                                const choosers = qAnswers.filter(a => {
+                                                    if (question.question_type === 'MULTIPLE_SELECT') {
+                                                        return a.answer_option_ids?.includes(option.id)
+                                                    }
+                                                    return a.answer_option_id === option.id
+                                                })
+
+                                                return (
+                                                    <div key={option.id} className="border border-green-200 bg-green-50/50 rounded-lg p-4">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <CheckCircle className="w-5 h-5 text-green-600" />
+                                                            <span className="font-bold text-green-900">{option.option_text}</span>
+                                                            <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full ml-2">CORRECT ANSWER</span>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-2 pl-7">
+                                                            {choosers.map(a => {
+                                                                const p = players.find(p => p.id === a.player_id)
+                                                                return p ? (
+                                                                    <div key={a.id} className="flex items-center gap-1.5 bg-white border border-green-100 shadow-sm px-2 py-1 rounded-md text-sm">
+                                                                        <span>{p.avatar}</span>
+                                                                        <span className="font-medium">{p.nickname}</span>
+                                                                    </div>
+                                                                ) : null
+                                                            })}
+                                                            {choosers.length === 0 && (
+                                                                <span className="text-muted-foreground text-sm italic">No one selected this.</span>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex flex-wrap gap-2 pl-7">
-                                                        {qAnswers.filter(a => a.answer_option_id === correctAnswer.id).map(a => {
-                                                            const p = players.find(p => p.id === a.player_id)
-                                                            return p ? (
-                                                                <div key={a.id} className="flex items-center gap-1.5 bg-white border border-green-100 shadow-sm px-2 py-1 rounded-md text-sm">
-                                                                    <span>{p.avatar}</span>
-                                                                    <span className="font-medium">{p.nickname}</span>
-                                                                </div>
-                                                            ) : null
-                                                        })}
-                                                        {qAnswers.filter(a => a.answer_option_id === correctAnswer.id).length === 0 && (
-                                                            <span className="text-muted-foreground text-sm italic">No one selected this.</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
+                                                )
+                                            })}
 
                                             {/* Incorrect Options */}
-                                            {question.answer_options?.filter(o => !o.is_correct).map(option => {
-                                                const choosers = qAnswers.filter(a => a.answer_option_id === option.id)
-                                                if (choosers.length === 0) return null // Hide if no one picked it? Or show 0? Let's hide to save space or show greyed out.
+                                            {incorrectOptions.map(option => {
+                                                const choosers = qAnswers.filter(a => {
+                                                    if (question.question_type === 'MULTIPLE_SELECT') {
+                                                        return a.answer_option_ids?.includes(option.id)
+                                                    }
+                                                    return a.answer_option_id === option.id
+                                                })
+
+                                                if (choosers.length === 0) return null
 
                                                 return (
                                                     <div key={option.id} className="border border-border bg-muted/20 rounded-lg p-4">
@@ -349,6 +370,24 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
                                                     </div>
                                                 )
                                             })}
+
+                                            {/* Time Up / Did Not Answer */}
+                                            {unansweredPlayers.length > 0 && (
+                                                <div className="border border-yellow-200 bg-yellow-50/50 rounded-lg p-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Clock className="w-5 h-5 text-yellow-600" />
+                                                        <span className="font-bold text-yellow-900">Time Up / No Answer</span>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-2 pl-7">
+                                                        {unansweredPlayers.map(p => (
+                                                            <div key={p.id} className="flex items-center gap-1.5 bg-white border border-yellow-100 shadow-sm px-2 py-1 rounded-md text-sm">
+                                                                <span>{p.avatar}</span>
+                                                                <span className="font-medium">{p.nickname}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )
