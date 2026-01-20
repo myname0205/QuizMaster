@@ -1,12 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
+import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
   title: "QuizMaster - Create Engaging Quizzes",
@@ -39,8 +40,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
-        {children}
+      <body className={`${inter.variable} font-sans antialiased min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-white`}>
+        {/* Global Background Effects */}
+        <div className="fixed inset-0 bg-background -z-50" />
+        <div className="fixed inset-0 bg-grid-pattern opacity-10 -z-40" />
+        <div className="fixed inset-0 bg-noise opacity-[0.03] pointer-events-none z-50 mix-blend-overlay" />
+
+        {/* Animated Blobs */}
+        <div className="fixed top-0 -left-20 w-[500px] h-[500px] bg-primary/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob opacity-50 -z-30" />
+        <div className="fixed top-1/2 -right-20 w-[600px] h-[600px] bg-secondary/20 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-2000 opacity-50 -z-30" />
+        <div className="fixed -bottom-40 left-1/3 w-[600px] h-[600px] bg-accent/20 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-4000 opacity-40 -z-30" />
+
+        <div className="relative z-0">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark" // Changed defaultTheme to "dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </div>
         <Toaster />
         <Analytics />
       </body>

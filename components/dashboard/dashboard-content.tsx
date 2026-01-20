@@ -201,8 +201,8 @@ export function DashboardContent({ user, profile, quizzes, pastSessions }: Dashb
             {quizzes.length === 0 ? (
               <Card className="bg-card border-border">
                 <CardContent className="flex flex-col items-center justify-center py-16">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <FileText className="w-8 h-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+                    <FileText className="w-8 h-8 text-secondary-foreground" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">No quizzes yet</h3>
                   <p className="text-muted-foreground text-center mb-6 max-w-sm">
@@ -271,8 +271,8 @@ export function DashboardContent({ user, profile, quizzes, pastSessions }: Dashb
             {pastSessions.length === 0 ? (
               <Card className="bg-card border-border">
                 <CardContent className="flex flex-col items-center justify-center py-16">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <Zap className="w-8 h-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+                    <Zap className="w-8 h-8 text-secondary-foreground" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">No past games yet</h3>
                   <p className="text-muted-foreground text-center mb-6 max-w-sm">

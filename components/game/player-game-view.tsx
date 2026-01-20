@@ -237,7 +237,7 @@ function PlayerGameContent() {
             </div>
 
             {isMultiSelect && (
-                <div className="text-center mb-6 text-sm text-muted-foreground font-medium uppercase tracking-wider animate-pulse">
+                <div className="text-center mb-6 text-sm text-muted-foreground font-medium uppercase tracking-wider">
                     Select all that apply
                 </div>
             )}
@@ -253,11 +253,11 @@ function PlayerGameContent() {
                             onClick={() => handleOptionClick(option.id)}
                             disabled={isSubmitting || hasAnswered}
                             className={cn(
-                                "flex flex-col items-center justify-center p-8 rounded-2xl border-b-8 transition-all shadow-lg relative",
-                                (isSubmitting || hasAnswered) ? "opacity-50 cursor-not-allowed" : "active:scale-95 active:border-b-0 translate-y-0 active:translate-y-2",
+                                "flex flex-col items-center justify-center p-8 rounded-2xl border-b-4 transition-all shadow-sm relative",
+                                (isSubmitting || hasAnswered) ? "opacity-50 cursor-not-allowed" : "active:scale-95 active:border-b-0 translate-y-0 active:translate-y-1",
                                 ANSWER_COLORS[index % ANSWER_COLORS.length],
                                 // Multi-select Styling Overrides for Selection State
-                                isMultiSelect && isSelected && "ring-4 ring-offset-4 ring-primary scale-[0.98] border-b-0 translate-y-2 brightness-110",
+                                isMultiSelect && isSelected && "ring-4 ring-offset-4 ring-primary scale-[0.98] border-b-0 translate-y-1 brightness-110",
                                 isMultiSelect && !isSelected && "opacity-90"
                             )}
                         >

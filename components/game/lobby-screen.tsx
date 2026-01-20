@@ -149,14 +149,14 @@ export function LobbyScreen({ session, quiz }: LobbyScreenProps) {
 
                 <div className="w-full max-w-4xl">
                     {players.length === 0 ? (
-                        <div className="text-center py-12 text-muted-foreground animate-pulse">
+                        <div className="text-center py-12 text-muted-foreground">
                             Waiting for players to join...
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             {players.map((player) => (
                                 <div key={player.id} className="group relative">
-                                    <Card className="bg-card border-border overflow-hidden hover:border-primary transition-colors">
+                                    <Card className="bg-card border-border overflow-hidden transition-colors shadow-sm">
                                         <CardContent className="p-4 flex flex-col items-center gap-2">
                                             <div className="text-4xl">{player.avatar || "👤"}</div>
                                             <span className="font-medium truncate w-full text-center">{player.nickname}</span>
