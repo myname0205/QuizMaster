@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, Clock } from "lucide-react"
 import type { Player, PlayerAnswer, Quiz } from "@/lib/types"
@@ -25,7 +25,6 @@ interface GameReportViewProps {
 }
 
 export function GameReportView({ players, answers, quiz, onBackToDashboard }: GameReportViewProps) {
-    const reportRef = useRef<HTMLDivElement>(null)
     const [isExporting, setIsExporting] = useState(false)
     const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
     const [downloadFilename, setDownloadFilename] = useState<string>("")
@@ -69,76 +68,126 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
     ]
 
     const handleExportPDF = async () => {
-        if (!reportRef.current) return
-
         setIsExporting(true)
-        setDownloadUrl(null) // Reset previous
-        setDownloadFilename("")
         toast.info("Generating PDF...")
 
         try {
-            const { toCanvas } = await import("html-to-image")
             const { jsPDF } = await import("jspdf")
+            // Import autotable - we need to cast it to any because the types might not perfectly align with the dynamic import
+            const autoTable = (await import("jspdf-autotable")).default
 
-            // Render DOM → Canvas (NO auto download)
-            const canvas = await toCanvas(reportRef.current, {
-                cacheBust: true,
-                pixelRatio: 2.5, // High quality
-                backgroundColor: "#f8fafc",
-                filter: (node) => {
-                    // Exclude elements with the 'export-exclude' class
-                    if (node instanceof HTMLElement && node.classList.contains("export-exclude")) {
-                        return false
-                    }
-                    return true
+            const doc = new jsPDF()
+
+            // 1. Title
+            doc.setFontSize(22)
+            doc.setTextColor(40, 40, 40)
+            doc.text(`Game Report: ${quiz.title}`, 14, 20)
+
+            doc.setFontSize(10)
+            doc.setTextColor(100, 100, 100)
+            const dateStr = new Date().toISOString().split("T")[0]
+            doc.text(`Generated on: ${dateStr}`, 14, 28)
+
+            // 2. Summary Stats
+            doc.setFontSize(14)
+            doc.setTextColor(0, 0, 0)
+            doc.text("Summary", 14, 40)
+
+            // Draw a simple box for accuracy
+            doc.setDrawColor(200, 200, 200)
+            doc.setFillColor(250, 250, 250)
+            doc.roundedRect(14, 45, 80, 25, 3, 3, "FD")
+
+            doc.setFontSize(10)
+            doc.setTextColor(100)
+            doc.text("Class Accuracy", 20, 52)
+            doc.setFontSize(16)
+            doc.setTextColor(stats.accuracy >= 70 ? 0 : stats.accuracy >= 40 ? 200 : 255, stats.accuracy >= 70 ? 150 : stats.accuracy >= 40 ? 150 : 50, 50)
+            doc.setTextColor(0) // Reset to black strictly for cleanliness or keep colorful? Let's keep black for "cleaner" look requested.
+            doc.text(`${stats.accuracy}%`, 20, 62)
+
+            // Toughest Question Box
+            if (stats.toughestQuestion) {
+                doc.setDrawColor(255, 200, 200)
+                doc.setFillColor(255, 240, 240)
+                doc.roundedRect(100, 45, 95, 25, 3, 3, "FD")
+
+                doc.setFontSize(10)
+                doc.setTextColor(150, 50, 50)
+                doc.text("Toughest Question", 106, 52)
+
+                doc.setFontSize(9)
+                doc.setTextColor(50, 50, 50)
+                // Truncate if too long
+                const qText = stats.toughestQuestion.question.question_text
+                const truncated = qText.length > 40 ? qText.substring(0, 37) + "..." : qText
+                doc.text(truncated, 106, 60)
+                doc.text(`${Math.round(stats.toughestQuestion.accuracy * 100)}% Correct`, 106, 66)
+            }
+
+            // 3. Player Leaderboard
+            doc.setFontSize(14)
+            doc.setTextColor(0)
+            doc.text("Player Results", 14, 85)
+
+            const sortedPlayers = [...players].sort((a, b) => b.total_score - a.total_score)
+            const tableData = sortedPlayers.map((p, i) => [
+                i + 1,
+                p.nickname,
+                p.total_score + " pts",
+                // Calculate correct answers count for this player
+                answers.filter(a => a.player_id === p.id && a.is_correct).length
+            ])
+
+            autoTable(doc, {
+                startY: 90,
+                head: [["Rank", "Player", "Score", "Correct Answers"]],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [66, 66, 66] },
+                styles: { fontSize: 10, cellPadding: 3 },
+            })
+
+            // 4. Question Breakdown
+            // @ts-ignore
+            const finalY = (doc as any).lastAutoTable.finalY + 15
+
+            doc.setFontSize(14)
+            doc.text("Question Analysis", 14, finalY)
+
+            const questionRows = (quiz.questions || []).map((q, i) => {
+                const qAnswers = answers.filter(a => a.question_id === q.id)
+                const correctCount = qAnswers.filter(a => a.is_correct).length
+                const accuracy = qAnswers.length > 0 ? Math.round((correctCount / qAnswers.length) * 100) : 0
+
+                return [
+                    `Q${i + 1}`,
+                    q.question_text,
+                    `${accuracy}%`,
+                    `${qAnswers.length}`
+                ]
+            })
+
+            autoTable(doc, {
+                startY: finalY + 5,
+                head: [["#", "Question", "Accuracy", "Responses"]],
+                body: questionRows,
+                theme: 'striped',
+                headStyles: { fillColor: [100, 100, 255] },
+                styles: { fontSize: 9 },
+                columnStyles: {
+                    1: { cellWidth: 100 } // Give question text more space
                 }
             })
 
-            const imgData = canvas.toDataURL("image/png")
-
-            const pdf = new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4",
-            })
-
-            const imgWidth = 210
-            const pageHeight = 297
-
-            const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-            let heightLeft = imgHeight
-            let position = 0
-
-            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
-            heightLeft -= pageHeight
-
-            while (heightLeft > 0) {
-                position -= pageHeight
-                pdf.addPage()
-                pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
-                heightLeft -= pageHeight
-            }
-
-            const dateStr = new Date().toISOString().split("T")[0]
+            // Save
             const safeTitle = (quiz.title || "Game_Report").replace(/[^a-z0-9_-]/gi, "_")
             const filename = `Report_${safeTitle}_${dateStr}.pdf`
-
-            // Use Data URI to bypass Blob security restrictions / filename stripping
-            const url = pdf.output('datauristring')
-
-            // Programmatic click to trigger download immediately
-            const link = document.createElement('a')
-            link.href = url
-            link.download = filename
-            link.style.display = 'none'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
+            doc.save(filename)
 
             toast.success("PDF Downloaded!")
         } catch (err) {
-            console.error(err)
+            console.error("PDF Export Error:", err)
             toast.error("Failed to generate PDF")
         } finally {
             setIsExporting(false)
@@ -190,7 +239,7 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
 
     return (
         <div className="min-h-screen bg-muted/20 p-8 flex flex-col items-center">
-            <div className="w-full max-w-6xl space-y-10" ref={reportRef}>
+            <div className="w-full max-w-6xl space-y-10">
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-bold">Game Report: {quiz.title}</h1>
                     <div className="flex gap-4 export-exclude">
