@@ -73,116 +73,207 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
 
         try {
             const { jsPDF } = await import("jspdf")
-            // Import autotable - we need to cast it to any because the types might not perfectly align with the dynamic import
             const autoTable = (await import("jspdf-autotable")).default
 
             const doc = new jsPDF()
 
-            // 1. Title
-            doc.setFontSize(22)
-            doc.setTextColor(40, 40, 40)
-            doc.text(`Game Report: ${quiz.title}`, 14, 20)
+            // --- Theme Colors ---
+            // Using RGB values roughly matching the app's primary/secondary
+            const PRIMARY_COLOR: [number, number, number] = [219, 39, 119] // Pink-ish
+            const SECONDARY_COLOR: [number, number, number] = [147, 51, 234] // Purple-ish
+            const ACCENT_COLOR: [number, number, number] = [34, 197, 94] // Green
+            const TEXT_COLOR: [number, number, number] = [40, 40, 40]
+            const LIGHT_TEXT: [number, number, number] = [255, 255, 255]
 
-            doc.setFontSize(10)
-            doc.setTextColor(100, 100, 100)
-            const dateStr = new Date().toISOString().split("T")[0]
-            doc.text(`Generated on: ${dateStr}`, 14, 28)
+            // --- 1. Header Section ---
+            // Draw colorful header bar
+            doc.setFillColor(...PRIMARY_COLOR)
+            doc.rect(0, 0, 210, 40, "F")
 
-            // 2. Summary Stats
+            // Title
+            doc.setFontSize(24)
+            doc.setTextColor(...LIGHT_TEXT)
+            doc.text("Game Report", 14, 20)
+
             doc.setFontSize(14)
-            doc.setTextColor(0, 0, 0)
-            doc.text("Summary", 14, 40)
+            doc.setFont("helvetica", "bold")
+            doc.text(quiz.title || "Untitled Quiz", 14, 30)
 
-            // Draw a simple box for accuracy
-            doc.setDrawColor(200, 200, 200)
-            doc.setFillColor(250, 250, 250)
-            doc.roundedRect(14, 45, 80, 25, 3, 3, "FD")
-
+            // Date
+            const dateStr = new Date().toLocaleDateString()
             doc.setFontSize(10)
-            doc.setTextColor(100)
-            doc.text("Class Accuracy", 20, 52)
-            doc.setFontSize(16)
-            doc.setTextColor(stats.accuracy >= 70 ? 0 : stats.accuracy >= 40 ? 200 : 255, stats.accuracy >= 70 ? 150 : stats.accuracy >= 40 ? 150 : 50, 50)
-            doc.setTextColor(0) // Reset to black strictly for cleanliness or keep colorful? Let's keep black for "cleaner" look requested.
-            doc.text(`${stats.accuracy}%`, 20, 62)
+            doc.setFont("helvetica", "normal")
+            doc.text(`Generated: ${dateStr}`, 14, 36)
 
-            // Toughest Question Box
+            // --- 2. Summary Cards ---
+            let startY = 55
+
+            // Card 1: Class Accuracy
+            doc.setDrawColor(200, 200, 200)
+            doc.setFillColor(255, 255, 255)
+            doc.roundedRect(14, startY, 85, 30, 3, 3, "FD")
+
+            // Icon placeholder / Title
+            doc.setTextColor(...TEXT_COLOR)
+            doc.setFontSize(11)
+            doc.text("Avg. Accuracy", 20, startY + 10)
+
+            // Value
+            doc.setFontSize(22)
+            doc.setFont("helvetica", "bold")
+            const accColor: [number, number, number] = stats.accuracy >= 70 ? ACCENT_COLOR : stats.accuracy >= 40 ? [234, 179, 8] : [239, 68, 68]
+            doc.setTextColor(...accColor)
+            doc.text(`${stats.accuracy}%`, 20, startY + 22)
+
+            // Card 2: Toughest Question
+            doc.setDrawColor(200, 200, 200)
+            doc.setFillColor(255, 255, 255)
+            doc.roundedRect(105, startY, 90, 30, 3, 3, "FD")
+
+            doc.setTextColor(...TEXT_COLOR)
+            doc.setFontSize(11)
+            doc.setFont("helvetica", "normal")
+            doc.text("Toughest Question", 111, startY + 10)
+
             if (stats.toughestQuestion) {
-                doc.setDrawColor(255, 200, 200)
-                doc.setFillColor(255, 240, 240)
-                doc.roundedRect(100, 45, 95, 25, 3, 3, "FD")
-
-                doc.setFontSize(10)
-                doc.setTextColor(150, 50, 50)
-                doc.text("Toughest Question", 106, 52)
-
                 doc.setFontSize(9)
-                doc.setTextColor(50, 50, 50)
-                // Truncate if too long
-                const qText = stats.toughestQuestion.question.question_text
-                const truncated = qText.length > 40 ? qText.substring(0, 37) + "..." : qText
-                doc.text(truncated, 106, 60)
-                doc.text(`${Math.round(stats.toughestQuestion.accuracy * 100)}% Correct`, 106, 66)
+                doc.setTextColor(80, 80, 80)
+
+                // Text wrapping for toughest question
+                const tqText = stats.toughestQuestion.question.question_text
+                const splitText = doc.splitTextToSize(tqText, 80)
+                // Limit to 2 lines to fit in box
+                const visibleText = splitText.length > 2 ? [splitText[0], splitText[1] + "..."] : splitText
+
+                doc.text(visibleText, 111, startY + 17)
+
+                // Accuracy for this question
+                doc.setFontSize(10)
+                doc.setFont("helvetica", "bold")
+                doc.setTextColor(239, 68, 68) // Red
+                doc.text(`${Math.round(stats.toughestQuestion.accuracy * 100)}% Correct`, 111, startY + 27)
+            } else {
+                doc.setFontSize(10)
+                doc.text("N/A - Good job!", 111, startY + 20)
             }
 
-            // 3. Player Leaderboard
+
+            // --- 3. Leaderboard Table ---
+            const leaderboardY = startY + 40
             doc.setFontSize(14)
-            doc.setTextColor(0)
-            doc.text("Player Results", 14, 85)
+            doc.setTextColor(...PRIMARY_COLOR)
+            doc.setFont("helvetica", "bold")
+            doc.text("Leaderboard", 14, leaderboardY)
 
             const sortedPlayers = [...players].sort((a, b) => b.total_score - a.total_score)
-            const tableData = sortedPlayers.map((p, i) => [
+            const playerRows = sortedPlayers.map((p, i) => [
                 i + 1,
                 p.nickname,
-                p.total_score + " pts",
-                // Calculate correct answers count for this player
+                `${p.total_score} pts`,
                 answers.filter(a => a.player_id === p.id && a.is_correct).length
             ])
 
             autoTable(doc, {
-                startY: 90,
-                head: [["Rank", "Player", "Score", "Correct Answers"]],
-                body: tableData,
+                startY: leaderboardY + 5,
+                head: [["Rank", "Player", "Score", "Correct"]],
+                body: playerRows,
                 theme: 'grid',
-                headStyles: { fillColor: [66, 66, 66] },
-                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: PRIMARY_COLOR, textColor: LIGHT_TEXT, fontStyle: 'bold' },
+                styles: { fontSize: 10, cellPadding: 3, textColor: TEXT_COLOR },
+                alternateRowStyles: { fillColor: [249, 250, 251] }
             })
 
-            // 4. Question Breakdown
+            // --- 4. Detailed Question Analysis ---
             // @ts-ignore
-            const finalY = (doc as any).lastAutoTable.finalY + 15
+            let finalY = (doc as any).lastAutoTable.finalY + 15
 
             doc.setFontSize(14)
-            doc.text("Question Analysis", 14, finalY)
+            doc.setTextColor(...PRIMARY_COLOR)
+            doc.setFont("helvetica", "bold")
+            doc.text("Detailed Question Analysis", 14, finalY)
+            finalY += 8
 
-            const questionRows = (quiz.questions || []).map((q, i) => {
+            // Prepare detailed rows
+            const questionDetailedRows = (quiz.questions || []).map((q, i) => {
                 const qAnswers = answers.filter(a => a.question_id === q.id)
                 const correctCount = qAnswers.filter(a => a.is_correct).length
                 const accuracy = qAnswers.length > 0 ? Math.round((correctCount / qAnswers.length) * 100) : 0
+
+                // Build breakdown string
+                let breakdownText = ""
+
+                // Correct Options match
+                const correctOptions = q.answer_options?.filter(o => o.is_correct) || []
+                correctOptions.forEach(opt => {
+                    const choosers = qAnswers.filter(a =>
+                        q.question_type === 'MULTIPLE_SELECT'
+                            ? a.answer_option_ids?.includes(opt.id)
+                            : a.answer_option_id === opt.id
+                    ).map(a => players.find(p => p.id === a.player_id)?.nickname).filter(Boolean)
+
+                    breakdownText += `[+] ${opt.option_text}: ${choosers.join(", ") || "(None)"}\n`
+                })
+
+                // Incorrect Options match
+                const incorrectOptions = q.answer_options?.filter(o => !o.is_correct) || []
+                incorrectOptions.forEach(opt => {
+                    const choosers = qAnswers.filter(a =>
+                        q.question_type === 'MULTIPLE_SELECT'
+                            ? a.answer_option_ids?.includes(opt.id)
+                            : a.answer_option_id === opt.id
+                    ).map(a => players.find(p => p.id === a.player_id)?.nickname).filter(Boolean)
+
+                    if (choosers.length > 0) {
+                        breakdownText += `[-] ${opt.option_text}: ${choosers.join(", ")}\n`
+                    }
+                })
+
+                // Did not answer
+                const answeredIds = new Set(qAnswers.map(a => a.player_id))
+                const noAnswer = players.filter(p => !answeredIds.has(p.id)).map(p => p.nickname)
+                if (noAnswer.length > 0) {
+                    breakdownText += `[!] No Answer: ${noAnswer.join(", ")}`
+                }
 
                 return [
                     `Q${i + 1}`,
                     q.question_text,
                     `${accuracy}%`,
-                    `${qAnswers.length}`
+                    breakdownText.trim()
                 ]
             })
 
             autoTable(doc, {
-                startY: finalY + 5,
-                head: [["#", "Question", "Accuracy", "Responses"]],
-                body: questionRows,
-                theme: 'striped',
-                headStyles: { fillColor: [100, 100, 255] },
-                styles: { fontSize: 9 },
+                startY: finalY,
+                head: [["#", "Question", "Acc.", "Detailed Breakdown"]],
+                body: questionDetailedRows,
+                theme: 'grid',
+                headStyles: { fillColor: SECONDARY_COLOR, textColor: LIGHT_TEXT },
+                styles: { fontSize: 9, cellPadding: 4, valign: 'top' },
                 columnStyles: {
-                    1: { cellWidth: 100 } // Give question text more space
+                    0: { cellWidth: 10, fontStyle: 'bold' },
+                    1: { cellWidth: 50, fontStyle: 'bold' },
+                    2: { cellWidth: 15, halign: 'center' },
+                    3: { cellWidth: 'auto' } // Takes remaining space for details
+                },
+                didParseCell: (data) => {
+                    // Colorize the breakdown column text slightly if needed? 
+                    // autoTable doesn't support rich text easily, but we can structure nicely.
                 }
             })
 
+            // Meta Footer
+            const pageCount = doc.getNumberOfPages()
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+                doc.setFontSize(8)
+                doc.setTextColor(150)
+                doc.text(`Page ${i} of ${pageCount} - QuizMaster AI Report`, 105, 290, { align: 'center' })
+            }
+
             // Save
             const safeTitle = (quiz.title || "Game_Report").replace(/[^a-z0-9_-]/gi, "_")
-            const filename = `Report_${safeTitle}_${dateStr}.pdf`
+            const filename = `Report_${safeTitle}_${dateStr.replace(/\//g, "-")}.pdf`
             doc.save(filename)
 
             toast.success("PDF Downloaded!")
