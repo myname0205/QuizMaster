@@ -251,7 +251,7 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
                 headStyles: { fillColor: SECONDARY_COLOR, textColor: LIGHT_TEXT },
                 styles: { fontSize: 9, cellPadding: 4, valign: 'top' },
                 columnStyles: {
-                    0: { cellWidth: 10, fontStyle: 'bold' },
+                    0: { cellWidth: 20, fontStyle: 'bold' },
                     1: { cellWidth: 50, fontStyle: 'bold' },
                     2: { cellWidth: 15, halign: 'center' },
                     3: { cellWidth: 'auto' } // Takes remaining space for details
@@ -455,17 +455,17 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
                                                 })
 
                                                 return (
-                                                    <div key={option.id} className="border border-green-200 bg-green-50/50 rounded-lg p-4">
+                                                    <div key={option.id} className="border border-green-200 bg-green-100 dark:bg-green-900/20 rounded-lg p-4">
                                                         <div className="flex items-center gap-2 mb-2">
-                                                            <CheckCircle className="w-5 h-5 text-green-600" />
-                                                            <span className="font-bold text-green-900">{option.option_text}</span>
-                                                            <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full ml-2">CORRECT ANSWER</span>
+                                                            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                                            <span className="font-bold text-green-900 dark:text-green-300">{option.option_text}</span>
+                                                            <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full ml-2">CORRECT ANSWER</span>
                                                         </div>
                                                         <div className="flex flex-wrap gap-2 pl-7">
                                                             {choosers.map(a => {
                                                                 const p = players.find(p => p.id === a.player_id)
                                                                 return p ? (
-                                                                    <div key={a.id} className="flex items-center gap-1.5 bg-white border border-green-100 shadow-sm px-2 py-1 rounded-md text-sm">
+                                                                    <div key={a.id} className="flex items-center gap-1.5 bg-background border border-green-200 dark:border-green-800 shadow-sm px-2 py-1 rounded-md text-sm">
                                                                         <span>{p.avatar}</span>
                                                                         <span className="font-medium">{p.nickname}</span>
                                                                     </div>
@@ -513,14 +513,14 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
 
                                             {/* Time Up / Did Not Answer */}
                                             {unansweredPlayers.length > 0 && (
-                                                <div className="border border-yellow-200 bg-yellow-50/50 rounded-lg p-4">
+                                                <div className="border border-yellow-200 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg p-4">
                                                     <div className="flex items-center gap-2 mb-2">
-                                                        <Clock className="w-5 h-5 text-yellow-600" />
-                                                        <span className="font-bold text-yellow-900">Time Up / No Answer</span>
+                                                        <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                                                        <span className="font-bold text-yellow-900 dark:text-yellow-300">Time Up / No Answer</span>
                                                     </div>
                                                     <div className="flex flex-wrap gap-2 pl-7">
                                                         {unansweredPlayers.map(p => (
-                                                            <div key={p.id} className="flex items-center gap-1.5 bg-white border border-yellow-100 shadow-sm px-2 py-1 rounded-md text-sm">
+                                                            <div key={p.id} className="flex items-center gap-1.5 bg-background border border-yellow-200 dark:border-yellow-800 shadow-sm px-2 py-1 rounded-md text-sm">
                                                                 <span>{p.avatar}</span>
                                                                 <span className="font-medium">{p.nickname}</span>
                                                             </div>
