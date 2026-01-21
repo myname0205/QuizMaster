@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Zap, Users, Trophy, Sparkles } from "lucide-react"
-import { ModeToggle } from "@/components/mode-toggle"
+
 
 export default function HomePage() {
   return (
@@ -16,7 +16,6 @@ export default function HomePage() {
             <span className="text-xl font-bold text-foreground tracking-tight">QuizMaster</span>
           </div>
           <div className="flex items-center gap-3">
-            <ModeToggle />
             <Link href="/auth/login">
               <Button variant="ghost" className="hover:bg-primary/10 hover:text-primary">Log In</Button>
             </Link>
