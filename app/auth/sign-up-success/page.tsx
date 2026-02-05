@@ -12,7 +12,7 @@ export default function SignUpSuccessPage() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">QuizMaster AI</span>
+            <span className="text-xl font-bold text-foreground">QuizMaster</span>
           </div>
 
           <Card className="bg-card border-border">

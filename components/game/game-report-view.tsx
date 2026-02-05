@@ -268,7 +268,7 @@ export function GameReportView({ players, answers, quiz, onBackToDashboard }: Ga
                 doc.setPage(i)
                 doc.setFontSize(8)
                 doc.setTextColor(150)
-                doc.text(`Page ${i} of ${pageCount} - QuizMaster AI Report`, 105, 290, { align: 'center' })
+                doc.text(`Page ${i} of ${pageCount} - QuizMaster Report`, 105, 290, { align: 'center' })
             }
 
             // Save
