@@ -11,11 +11,58 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://quiz-master-two.vercel.app"
+
 export const metadata: Metadata = {
-  title: "QuizMaster - Create Engaging Quizzes",
-  description:
-    "Generate AI-powered quizzes and host real-time competitive games for classrooms, training, and trivia nights.",
-  generator: "v0.app",
+  title: {
+    default: "QuizMaster - AI-Powered Quiz Generator & Game Host",
+    template: "%s | QuizMaster"
+  },
+  description: "Generate engaging AI quizzes in seconds. Host real-time multiplayer trivia games for classrooms, team building, and events. No account needed to play.",
+  metadataBase: new URL(appUrl),
+  keywords: ["AI quiz generator", "trivia game host", "classroom quizzes", "team building games", "learning platform", "educational technology", "real-time quiz"],
+  authors: [{ name: "QuizMaster Team" }],
+  creator: "QuizMaster",
+  publisher: "QuizMaster",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: "QuizMaster - Create Engaging AI Quizzes in Seconds",
+    description: "Transform any topic into an interactive quiz instantly. Host live games, track progress, and engage your audience with QuizMaster.",
+    url: appUrl,
+    siteName: "QuizMaster",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png", // We might need to create this or use a placeholder
+        width: 1200,
+        height: 630,
+        alt: "QuizMaster AI - Create and Host Quizzes",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "QuizMaster - AI-Powered Quiz Platform",
+    description: "Generate quizzes instantly with AI. Host live games for friends, students, or colleagues.",
+    images: ["/og-image.png"], // Same as OG for now
+    creator: "@quizmaster", // Placeholder
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -27,6 +74,9 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/site.webmanifest",
+  alternates: {
+    canonical: "/",
+  },
 }
 
 export default function RootLayout({
