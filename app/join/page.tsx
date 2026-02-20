@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Zap, ArrowRight, User } from "lucide-react"
+import { ArrowRight, User } from "lucide-react"
+import Image from "next/image"
 import { toast } from "sonner"
 import { AVATARS } from "@/lib/types"
 
@@ -83,8 +84,14 @@ export default function JoinPage() {
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-md space-y-8">
                 <div className="text-center">
-                    <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-                        <Zap className="w-6 h-6 text-primary-foreground" />
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                        <Image src="/quidle-logo.svg" alt="Quidle" width={52} height={52} />
+                        <span
+                            className="font-[family-name:var(--font-brand)] text-3xl font-bold"
+                            style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+                        >
+                            Quidle
+                        </span>
                     </div>
                     <h1 className="text-2xl font-bold text-foreground">Join a Game</h1>
                     <p className="text-muted-foreground mt-2">Enter the code provided by your host</p>
@@ -133,8 +140,8 @@ export default function JoinPage() {
                                                 type="button"
                                                 onClick={() => setSelectedAvatar(avatar)}
                                                 className={`text-2xl p-1 rounded-lg transition-all ${selectedAvatar === avatar
-                                                        ? "bg-primary/20 ring-2 ring-primary scale-110"
-                                                        : "hover:bg-muted"
+                                                    ? "bg-primary/20 ring-2 ring-primary scale-110"
+                                                    : "hover:bg-muted"
                                                     }`}
                                             >
                                                 {avatar}

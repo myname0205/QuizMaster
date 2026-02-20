@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client"
 import type { GameSession, Quiz, Question, AnswerOption, Player } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Zap, Users, Play, Copy, Check, X } from "lucide-react"
+import { Users, Play, Copy, Check, X } from "lucide-react"
+import Image from "next/image"
 import { toast } from "sonner"
 
 type FullSession = GameSession & {
@@ -113,11 +114,15 @@ export function HostLobby({ session }: HostLobbyProps) {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">{session.quiz.title}</span>
+          <div className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle" width={36} height={36} />
+            <span
+              className="font-[family-name:var(--font-brand)] font-bold text-lg"
+              style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+            >
+              Quidle
+            </span>
+            <span className="text-muted-foreground font-normal text-sm">— {session.quiz.title}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="w-5 h-5" />
@@ -129,7 +134,7 @@ export function HostLobby({ session }: HostLobbyProps) {
       <main className="flex-1 flex flex-col items-center justify-center p-6">
         {/* Game Code Display */}
         <div className="text-center mb-12">
-          <p className="text-lg text-muted-foreground mb-2">Join at quizmaster.ai or enter code</p>
+          <p className="text-lg text-muted-foreground mb-2">Players join at <span className="text-primary font-medium">quidle.app</span> or enter code</p>
           <div className="flex items-center gap-3">
             <div className="text-6xl md:text-8xl font-bold tracking-widest text-foreground">{session.game_code}</div>
             <Button variant="outline" size="icon" className="bg-transparent" onClick={copyCode}>

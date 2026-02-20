@@ -7,7 +7,8 @@ import type { GameSession, Quiz, Question, AnswerOption, Player, PlayerAnswer } 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Zap, Users, ChevronRight, Trophy } from "lucide-react"
+import { Users, ChevronRight, Trophy } from "lucide-react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 type FullSession = GameSession & {
@@ -199,11 +200,15 @@ export function HostGame({ session, initialPlayers }: HostGameProps) {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">{session.quiz.title}</span>
+          <div className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle" width={32} height={32} />
+            <span
+              className="font-[family-name:var(--font-brand)] font-bold"
+              style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+            >
+              Quidle
+            </span>
+            <span className="text-muted-foreground font-normal text-sm">— {session.quiz.title}</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-muted-foreground">

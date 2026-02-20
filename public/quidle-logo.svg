@@ -1,47 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" fill="none">
   <defs>
-    <linearGradient id="ringGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+    <linearGradient id="g1" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#E040FB"/>
       <stop offset="100%" stop-color="#00E5FF"/>
     </linearGradient>
-    <linearGradient id="boltGrad" x1="60" y1="60" x2="110" y2="110" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#00E5FF"/>
-      <stop offset="100%" stop-color="#E040FB"/>
+    <linearGradient id="g2" x1="55" y1="55" x2="95" y2="15" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E040FB"/>
+      <stop offset="100%" stop-color="#00E5FF"/>
     </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-      </feMerge>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <!-- Soft background glow blob -->
-  <circle cx="52" cy="52" r="38" fill="url(#ringGrad)" opacity="0.12" filter="url(#softglow)"/>
-
-  <!-- Q ring — open arc (270 degrees, gap at bottom-right for the bolt) -->
+  <!-- Q ring: open arc, 270°, gap at bottom-right -->
   <path
-    d="M 52 14
-       A 38 38 0 1 1 81.9 76.9"
-    stroke="url(#ringGrad)"
-    stroke-width="12"
+    d="M 44 8 A 36 36 0 1 1 72 68"
+    stroke="url(#g1)"
+    stroke-width="10"
     stroke-linecap="round"
     fill="none"
     filter="url(#glow)"
   />
 
-  <!-- Lightning bolt — the tail of the Q, clean chevron shape -->
+  <!-- Lightning bolt tail of the Q -->
   <polyline
-    points="79,77  96,52  86,52  106,22"
-    stroke="url(#boltGrad)"
-    stroke-width="11"
+    points="69,67 84,46 76,46 91,22"
+    stroke="url(#g2)"
+    stroke-width="9"
     stroke-linecap="round"
     stroke-linejoin="round"
     fill="none"
