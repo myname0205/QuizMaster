@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Zap } from "lucide-react"
+import Image from "next/image"
 import { GoogleAuthButton } from "@/components/auth/google-auth-button"
 
 export default function SignUpPage() {
@@ -58,11 +58,9 @@ export default function SignUpPage() {
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-background">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">QuizMaster</span>
+          <div className="flex items-center justify-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={36} height={36} />
+            <span className="font-[family-name:var(--font-brand)] text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </div>
 
           <Card className="bg-card border-border">

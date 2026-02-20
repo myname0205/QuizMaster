@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Geist_Mono } from "next/font/google"
+import { Inter, Geist_Mono, Outfit } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -10,47 +10,48 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-brand", weight: ["400", "600", "700", "800"] })
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://quiz-master-two.vercel.app"
 
 export const metadata: Metadata = {
   title: {
-    default: "QuizMaster - AI-Powered Quiz Generator & Game Host",
-    template: "%s | QuizMaster"
+    default: "Quidle - AI-Powered Quiz Generator & Game Host",
+    template: "%s | Quidle"
   },
   description: "Generate engaging AI quizzes in seconds. Host real-time multiplayer trivia games for classrooms, team building, and events. No account needed to play.",
   metadataBase: new URL(appUrl),
   keywords: ["AI quiz generator", "trivia game host", "classroom quizzes", "team building games", "learning platform", "educational technology", "real-time quiz"],
-  authors: [{ name: "QuizMaster Team" }],
-  creator: "QuizMaster",
-  publisher: "QuizMaster",
+  authors: [{ name: "Quidle Team" }],
+  creator: "Quidle",
+  publisher: "Quidle",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   openGraph: {
-    title: "QuizMaster - Create Engaging AI Quizzes in Seconds",
-    description: "Transform any topic into an interactive quiz instantly. Host live games, track progress, and engage your audience with QuizMaster.",
+    title: "Quidle - Create Engaging AI Quizzes in Seconds",
+    description: "Transform any topic into an interactive quiz instantly. Host live games, track progress, and engage your audience with Quidle.",
     url: appUrl,
-    siteName: "QuizMaster",
+    siteName: "Quidle",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/og-image.png", // We might need to create this or use a placeholder
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "QuizMaster AI - Create and Host Quizzes",
+        alt: "Quidle - Create and Host AI Quizzes",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QuizMaster - AI-Powered Quiz Platform",
+    title: "Quidle - AI-Powered Quiz Platform",
     description: "Generate quizzes instantly with AI. Host live games for friends, students, or colleagues.",
-    images: ["/og-image.png"], // Same as OG for now
-    creator: "@quizmaster", // Placeholder
+    images: ["/og-image.png"],
+    creator: "@quidle",
   },
   robots: {
     index: true,
@@ -86,7 +87,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-white`}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-white`}>
         {/* Global Background Effects */}
         <div className="fixed inset-0 bg-background -z-50" />
         <div className="fixed inset-0 bg-grid-pattern opacity-10 -z-40" />

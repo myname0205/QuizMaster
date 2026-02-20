@@ -1,6 +1,7 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Zap, Users, Trophy, Sparkles } from "lucide-react"
+import { Users, Trophy, Sparkles } from "lucide-react"
 
 
 export default function HomePage() {
@@ -9,11 +10,9 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-border/10 backdrop-blur-md relative z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground tracking-tight">QuizMaster</span>
+          <div className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={36} height={36} />
+            <span className="font-[family-name:var(--font-brand)] text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-tight">Quidle</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/auth/login">
@@ -34,7 +33,7 @@ export default function HomePage() {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              "name": "QuizMaster",
+              "name": "Quidle",
               "applicationCategory": "EducationalApplication",
               "operatingSystem": "Web",
               "offers": {

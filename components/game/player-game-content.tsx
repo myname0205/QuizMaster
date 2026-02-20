@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Zap, Clock, Check, X, CheckCircle2, Loader2 } from "lucide-react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
@@ -232,11 +233,9 @@ export function PlayerGameContent({ params }: { params?: Promise<{ sessionId: st
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">QuizMaster</span>
+          <div className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={28} height={28} />
+            <span className="font-[family-name:var(--font-brand)] font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </div>
           <div className="text-right">
             <div className="text-sm text-muted-foreground">Score</div>

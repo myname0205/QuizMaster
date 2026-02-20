@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="qGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E040FB"/>
+      <stop offset="100%" stop-color="#00E5FF"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#E040FB"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer ring of Q -->
+  <circle cx="95" cy="95" r="62" stroke="url(#qGrad)" stroke-width="14" filter="url(#glow)"/>
+
+  <!-- Inner cutout -->
+  <circle cx="95" cy="95" r="34" fill="none"/>
+
+  <!-- Lightning bolt tail of the Q (bottom-right) -->
+  <!-- The "tail" extends diagonally from bottom-right of the Q ring -->
+  <polyline
+    points="133,133  152,107  141,107  165,72"
+    stroke="url(#boltGrad)"
+    stroke-width="13"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glow)"
+  />
+</svg>

@@ -8,6 +8,7 @@ import type { Player } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Zap, Trophy, Home } from "lucide-react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 export function PlayerResultsContent({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -49,11 +50,9 @@ export function PlayerResultsContent({ params }: { params: Promise<{ sessionId: 
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">QuizMaster</span>
+          <div className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={28} height={28} />
+            <span className="font-[family-name:var(--font-brand)] font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </div>
         </div>
       </header>

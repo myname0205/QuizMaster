@@ -4,6 +4,7 @@ import { useState } from "react"
 import type { User } from "@supabase/supabase-js"
 import type { Profile, Quiz } from "@/lib/types"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Zap, Plus, Play, Edit, Trash2, MoreVertical, LogOut, FileText, Calendar, Users as UsersIcon } from "lucide-react"
@@ -159,11 +160,9 @@ export function DashboardContent({ user, profile, quizzes, pastSessions }: Dashb
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">QuizMaster</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={36} height={36} />
+            <span className="font-[family-name:var(--font-brand)] text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </Link>
 
           <div className="flex items-center gap-4">

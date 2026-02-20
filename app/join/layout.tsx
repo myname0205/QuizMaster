@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-    title: "Join a Game | QuizMaster",
+    title: "Join a Game | Quidle",
     description: "Enter your game code to join a live quiz session.",
 }
 

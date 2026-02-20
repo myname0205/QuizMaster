@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Zap, Users } from "lucide-react"
+import Image from "next/image"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { AVATARS } from "@/lib/types"
@@ -171,11 +172,9 @@ export function PlayerLobby({ session }: PlayerLobbyProps) {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">QuizMaster</span>
+          <div className="flex items-center gap-2.5">
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={36} height={36} />
+            <span className="font-[family-name:var(--font-brand)] text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </div>
         </div>
       </header>
