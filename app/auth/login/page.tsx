@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-center gap-2.5">
-            <Image src="/quidle-logo.svg" alt="Quidle logo" width={36} height={36} />
+            <Image src="/quidle-logo.svg" alt="Quidle logo" width={44} height={44} />
             <span className="font-[family-name:var(--font-brand)] text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </div>
 

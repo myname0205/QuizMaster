@@ -1,36 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
   <defs>
-    <linearGradient id="qGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#E040FB"/>
       <stop offset="100%" stop-color="#00E5FF"/>
     </linearGradient>
-    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="boltGrad" x1="60" y1="60" x2="110" y2="110" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#00E5FF"/>
       <stop offset="100%" stop-color="#E040FB"/>
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
       </feMerge>
     </filter>
   </defs>
 
-  <!-- Outer ring of Q -->
-  <circle cx="95" cy="95" r="62" stroke="url(#qGrad)" stroke-width="14" filter="url(#glow)"/>
+  <!-- Soft background glow blob -->
+  <circle cx="52" cy="52" r="38" fill="url(#ringGrad)" opacity="0.12" filter="url(#softglow)"/>
 
-  <!-- Inner cutout -->
-  <circle cx="95" cy="95" r="34" fill="none"/>
+  <!-- Q ring — open arc (270 degrees, gap at bottom-right for the bolt) -->
+  <path
+    d="M 52 14
+       A 38 38 0 1 1 81.9 76.9"
+    stroke="url(#ringGrad)"
+    stroke-width="12"
+    stroke-linecap="round"
+    fill="none"
+    filter="url(#glow)"
+  />
 
-  <!-- Lightning bolt tail of the Q (bottom-right) -->
-  <!-- The "tail" extends diagonally from bottom-right of the Q ring -->
+  <!-- Lightning bolt — the tail of the Q, clean chevron shape -->
   <polyline
-    points="133,133  152,107  141,107  165,72"
+    points="79,77  96,52  86,52  106,22"
     stroke="url(#boltGrad)"
-    stroke-width="13"
+    stroke-width="11"
     stroke-linecap="round"
     stroke-linejoin="round"
+    fill="none"
     filter="url(#glow)"
   />
 </svg>
