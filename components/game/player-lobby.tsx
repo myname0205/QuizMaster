@@ -130,10 +130,8 @@ export function PlayerLobby({ session }: PlayerLobbyProps) {
       <div className="min-h-screen bg-background flex flex-col">
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-4 flex items-center justify-center">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Zap className="w-4 h-4 text-primary-foreground" />
-              </div>
+            <div className="flex items-center gap-3">
+              <Image src="/logo.svg" alt="Quidle" width={32} height={32} />
               <span className="font-semibold text-foreground">{session.quiz.title}</span>
             </div>
           </div>

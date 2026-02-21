@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import type { Quiz, Question, AnswerOption } from "@/lib/types"
 import { Button } from "@/components/ui/button"
@@ -316,10 +317,8 @@ export function QuizEditor({ userId, existingQuiz }: QuizEditorProps) {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Zap className="w-4 h-4 text-primary-foreground" />
-              </div>
+            <div className="flex items-center gap-3">
+              <Image src="/logo.svg" alt="Quidle" width={32} height={32} />
               <span className="font-semibold text-foreground">{existingQuiz ? "Edit Quiz" : "New Quiz"}</span>
             </div>
           </div>
