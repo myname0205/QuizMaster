@@ -29,7 +29,7 @@ export default function HomePage() {
             </Link>
             <Link href="/auth/sign-up">
               <Button
-                className="font-semibold px-5"
+                className="font-semibold px-5 border-0 backdrop-blur-none"
                 style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", boxShadow: "0 0 24px -4px #E040FB88" }}
               >
                 Get Started
@@ -112,7 +112,7 @@ export default function HomePage() {
             <Link href="/auth/sign-up">
               <Button
                 size="lg"
-                className="text-lg px-10 py-6 h-auto font-bold transition-all hover:-translate-y-1"
+                className="text-lg px-10 py-6 h-auto font-bold transition-all hover:-translate-y-1 border-0 backdrop-blur-none"
                 style={{
                   background: "linear-gradient(135deg,#E040FB,#00E5FF)",
                   boxShadow: "0 0 30px -6px #E040FB, 0 4px 20px rgba(0,0,0,0.3)"
