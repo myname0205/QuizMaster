@@ -161,7 +161,7 @@ export function DashboardContent({ user, profile, quizzes, pastSessions }: Dashb
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/quidle-logo.svg" alt="Quidle logo" width={44} height={44} />
+            <Image src="/logo.svg" alt="Quidle logo" width={44} height={44} />
             <span className="font-[family-name:var(--font-brand)] text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </Link>
 

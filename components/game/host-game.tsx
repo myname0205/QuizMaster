@@ -201,7 +201,7 @@ export function HostGame({ session, initialPlayers }: HostGameProps) {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/quidle-logo.svg" alt="Quidle" width={32} height={32} />
+            <Image src="/logo.svg" alt="Quidle" width={32} height={32} />
             <span
               className="font-[family-name:var(--font-brand)] font-bold"
               style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}

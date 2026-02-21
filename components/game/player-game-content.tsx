@@ -234,7 +234,7 @@ export function PlayerGameContent({ params }: { params?: Promise<{ sessionId: st
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/quidle-logo.svg" alt="Quidle logo" width={36} height={36} />
+            <Image src="/logo.svg" alt="Quidle logo" width={36} height={36} />
             <span className="font-[family-name:var(--font-brand)] font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Quidle</span>
           </div>
           <div className="text-right">

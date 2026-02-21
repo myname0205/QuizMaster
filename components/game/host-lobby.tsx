@@ -115,7 +115,7 @@ export function HostLobby({ session }: HostLobbyProps) {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/quidle-logo.svg" alt="Quidle" width={36} height={36} />
+            <Image src="/logo.svg" alt="Quidle" width={36} height={36} />
             <span
               className="font-[family-name:var(--font-brand)] font-bold text-lg"
               style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}

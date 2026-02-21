@@ -85,7 +85,7 @@ export default function JoinPage() {
             <div className="w-full max-w-md space-y-8">
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
-                        <Image src="/quidle-logo.svg" alt="Quidle" width={52} height={52} />
+                        <Image src="/logo.svg" alt="Quidle" width={52} height={52} />
                         <span
                             className="font-[family-name:var(--font-brand)] text-3xl font-bold"
                             style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}

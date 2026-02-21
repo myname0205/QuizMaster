@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo + wordmark — bigger in navbar */}
           <div className="flex items-center gap-3">
-            <Image src="/quidle-logo.svg" alt="Quidle" width={44} height={44} />
+            <Image src="/logo.svg" alt="Quidle" width={44} height={44} />
             <span
               className="font-[family-name:var(--font-brand)] text-2xl font-bold tracking-tight"
               style={{ background: "linear-gradient(135deg,#E040FB,#00E5FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
@@ -69,7 +69,7 @@ export default function HomePage() {
               <div className="absolute inset-0 rounded-full blur-3xl opacity-30"
                 style={{ background: "radial-gradient(circle, #E040FB 0%, #00E5FF 100%)", transform: "scale(1.6)" }} />
               <Image
-                src="/quidle-logo.svg"
+                src="/logo.svg"
                 alt="Quidle"
                 width={120}
                 height={120}
