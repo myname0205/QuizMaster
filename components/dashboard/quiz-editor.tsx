@@ -490,7 +490,7 @@ export function QuizEditor({ userId, existingQuiz }: QuizEditorProps) {
                               className={cn(
                                 "h-5 w-5 border-2",
                                 option.is_correct
-                                  ? "data-[state=checked]:bg-green-600 data-[state=checked]:text-white border-green-600"
+                                  ? "data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-600 data-[state=checked]:text-white border-green-600 dark:border-green-600"
                                   : "border-muted-foreground"
                               )}
                             />
@@ -502,7 +502,8 @@ export function QuizEditor({ userId, existingQuiz }: QuizEditorProps) {
                               }}
                               disabled={question.question_type === "TRUE_FALSE"}
                               className={cn(
-                                "border-0 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto",
+                                "border-0 bg-transparent dark:bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto",
+                                "w-full focus:bg-transparent focus-visible:bg-transparent",
                                 question.question_type === "TRUE_FALSE" && "opacity-100 font-bold"
                               )}
                             />
