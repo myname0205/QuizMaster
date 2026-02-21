@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" fill="none">
   <defs>
-    <linearGradient id="g1" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+    <linearGradient id="g1" x1="20" y1="20" x2="120" y2="120" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#E040FB"/>
       <stop offset="100%" stop-color="#00E5FF"/>
     </linearGradient>
-    <linearGradient id="g2" x1="55" y1="55" x2="95" y2="15" gradientUnits="userSpaceOnUse">
+    <linearGradient id="g2" x1="75" y1="75" x2="115" y2="35" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#E040FB"/>
       <stop offset="100%" stop-color="#00E5FF"/>
     </linearGradient>
@@ -14,24 +14,22 @@
     </filter>
   </defs>
 
-  <g transform="translate(20, 20)">
-    <path
-      d="M 44 8 A 36 36 0 1 1 72 68"
-      stroke="url(#g1)"
-      stroke-width="10"
-      stroke-linecap="round"
-      fill="none"
-      filter="url(#glow)"
-    />
+  <path
+    d="M 64 28 A 36 36 0 1 1 92 88"
+    stroke="url(#g1)"
+    stroke-width="10"
+    stroke-linecap="round"
+    fill="none"
+    filter="url(#glow)"
+  />
 
-    <polyline
-      points="69,67 84,46 76,46 91,22"
-      stroke="url(#g2)"
-      stroke-width="9"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      fill="none"
-      filter="url(#glow)"
-    />
-  </g>
+  <polyline
+    points="89,87 104,66 96,66 111,42"
+    stroke="url(#g2)"
+    stroke-width="9"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    filter="url(#glow)"
+  />
 </svg>
